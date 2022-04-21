@@ -4,6 +4,7 @@ import { PrismaModule } from './prisma/prisma.module'
 import { AuthModule } from './auth/auth.module'
 import { ConfigModule } from '@nestjs/config'
 import { configValidatioSchema } from './core/config.schema'
+import { InvoicesModule } from './invoices/invoices.module'
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { configValidatioSchema } from './core/config.schema'
     }),
     CryptographyModule,
     PrismaModule,
-    AuthModule
+    AuthModule,
+    InvoicesModule
   ],
   controllers: [],
   providers: []

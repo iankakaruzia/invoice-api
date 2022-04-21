@@ -16,7 +16,82 @@ model User {
   name      String
   password  String
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invoices Invoice[]
 
   @@map("users")
+}
+
+model Invoice {
+  id          Int       @id @default(autoincrement())
+  slug        String    @unique
+  date        DateTime?
+  description String?
+  status      Status
+  paymentTerm Int?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  billFrom BillFrom?
+  billTo   BillTo?
+
+  items Item[]
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  @@map("invoices")
+}
+
+model Item {
+  id        Int      @id @default(autoincrement())
+  name      String?
+  price     Float?
+  quantity  Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  invoiceId Int
+
+  @@map("items")
+}
+
+model BillFrom {
+  id        Int      @id @default(autoincrement())
+  address   String?
+  city      String?
+  postcode  String?
+  country   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  invoiceId Int     @unique
+
+  @@map("bill_from")
+}
+
+model BillTo {
+  id        Int      @id @default(autoincrement())
+  name      String?
+  email     String?
+  address   String?
+  city      String?
+  postcode  String?
+  country   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  invoiceId Int     @unique
+
+  @@map("bill_to")
+}
+
+enum Status {
+  DRAFT
+  PENDING
+  PAID
 }

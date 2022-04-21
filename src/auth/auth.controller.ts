@@ -7,7 +7,7 @@ import {
   UseGuards
 } from '@nestjs/common'
 import { User as UserModel } from '@prisma/client'
-import { CurrentDecorator } from '../shared/decorators/current-user.decorator'
+import { CurrentUser } from '../shared/decorators/current-user.decorator'
 import { AuthService } from './auth.service'
 import { RegisterDTO } from './dtos/register.dto'
 import { LocalAuthGuard } from './guards/local-auth.guard'
@@ -19,7 +19,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@CurrentDecorator() user: UserModel) {
+  async login(@CurrentUser() user: UserModel) {
     return this.authService.login(user)
   }
 
