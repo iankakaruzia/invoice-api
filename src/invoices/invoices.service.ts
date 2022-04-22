@@ -3,12 +3,19 @@ import { Status, User as UserModel } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 import { CreateDraftInvoiceDTO } from './dtos/create-draft-invoice.dto'
 import { CreatePendingInvoiceDTO } from './dtos/create-pending-invoice.dto'
+import {
+  GetInvoicesResultDTO,
+  InvoiceDTO
+} from './dtos/get-invoices-result.dto'
+import { GetInvoicesDTO } from './dtos/get-invoices.dto'
 import { calculateDueDate } from './helpers/calculate-due-date'
 import { calculateTotalItems } from './helpers/calculate-total-items'
 import { generateSlug } from './helpers/generate-slug'
 
 @Injectable()
 export class InvoicesService {
+  private static invoicesPerPage = 10
+
   constructor(private readonly prisma: PrismaService) {}
 
   async createDraftInvoice(
@@ -105,7 +112,73 @@ export class InvoicesService {
       ...invoice,
       items,
       itemsTotal,
-      dueDate: calculateDueDate(invoice)
+      dueDate: calculateDueDate(invoice.date, invoice.paymentTerm)
+    }
+  }
+
+  async getInvoices(
+    { cursor = null, status }: GetInvoicesDTO,
+    user: UserModel
+  ): Promise<GetInvoicesResultDTO> {
+    const invoices = await this.prisma.invoice.findMany({
+      take: InvoicesService.invoicesPerPage,
+      ...(cursor !== null
+        ? {
+            cursor: {
+              id: parseInt(Buffer.from(cursor, 'base64').toString('ascii'))
+            },
+            skip: 1
+          }
+        : {}),
+      where: {
+        userId: user.id,
+        ...(status
+          ? {
+              status
+            }
+          : {})
+      },
+      orderBy: {
+        id: 'desc'
+      },
+      select: {
+        id: true,
+        slug: true,
+        date: true,
+        paymentTerm: true,
+        status: true,
+        billTo: {
+          select: {
+            name: true
+          }
+        },
+        items: true
+      }
+    })
+
+    const invoicesDTO: InvoiceDTO[] = invoices.map((invoice) => {
+      const { itemsTotal } = calculateTotalItems(invoice.items)
+      return {
+        id: invoice.id,
+        slug: invoice.slug,
+        status: invoice.status,
+        billTo: invoice.billTo?.name ?? null,
+        dueDate: calculateDueDate(invoice.date, invoice.paymentTerm),
+        total: itemsTotal
+      }
+    })
+
+    return {
+      data: {
+        invoices: invoicesDTO
+      },
+      previousCursor: cursor,
+      nextCursor:
+        invoices.length === InvoicesService.invoicesPerPage
+          ? Buffer.from(invoices[invoices.length - 1].id.toString()).toString(
+              'base64'
+            )
+          : null
     }
   }
 

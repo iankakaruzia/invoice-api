@@ -6,6 +6,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards
 } from '@nestjs/common'
 import { User as UserModel } from '@prisma/client'
@@ -15,6 +16,7 @@ import { CurrentUser } from '../shared/decorators/current-user.decorator'
 import { CreateDraftInvoiceDTO } from './dtos/create-draft-invoice.dto'
 import { CreatePendingInvoiceDTO } from './dtos/create-pending-invoice.dto'
 import { InvoicesService } from './invoices.service'
+import { GetInvoicesDTO } from './dtos/get-invoices.dto'
 
 @ApiTags('Invoices')
 @ApiBearerAuth()
@@ -22,6 +24,14 @@ import { InvoicesService } from './invoices.service'
 @UseGuards(JwtAuthGuard)
 export class InvoicesController {
   constructor(private readonly invoicesService: InvoicesService) {}
+
+  @Get()
+  async getInvoices(
+    @Query() getInvoicesDTO: GetInvoicesDTO,
+    @CurrentUser() user: UserModel
+  ) {
+    return this.invoicesService.getInvoices(getInvoicesDTO, user)
+  }
 
   @Get(':id')
   async getInvoiceById(

@@ -1,7 +1,9 @@
 import { addDays } from 'date-fns'
-import { Invoice } from '@prisma/client'
 
-export function calculateDueDate({ date, paymentTerm }: Invoice) {
+export function calculateDueDate(
+  date: Date | null,
+  paymentTerm: number | null
+) {
   if (!date || !paymentTerm) {
     return null
   }
