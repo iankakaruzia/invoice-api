@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module'
 import { ConfigModule } from '@nestjs/config'
 import { configValidatioSchema } from './core/config.schema'
 import { InvoicesModule } from './invoices/invoices.module'
+import { HealthModule } from './health/health.module'
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { InvoicesModule } from './invoices/invoices.module'
     CryptographyModule,
     PrismaModule,
     AuthModule,
-    InvoicesModule
+    InvoicesModule,
+    HealthModule
   ],
   controllers: [],
   providers: []
