@@ -16,100 +16,100 @@ class BillTo {
   @IsString()
   @IsNotEmpty()
   @IsOptional()
-  name: string
+  name?: string
 
   @IsEmail()
   @IsNotEmpty()
   @IsOptional()
-  email: string
+  email?: string
 
   @IsString()
   @IsNotEmpty()
   @IsOptional()
-  address: string
+  address?: string
 
   @IsString()
   @IsNotEmpty()
   @IsOptional()
-  city: string
+  city?: string
 
   @IsString()
   @IsNotEmpty()
   @IsOptional()
-  country: string
+  country?: string
 
   @IsString()
   @IsNotEmpty()
   @IsOptional()
-  postcode: string
+  postcode?: string
 }
 
 class Item {
   @IsString()
   @IsNotEmpty()
   @IsOptional()
-  name: string
+  name?: string
 
   @IsNumber()
   @IsOptional()
-  quantity: number
+  quantity?: number
 
   @IsNumber({ maxDecimalPlaces: 2 })
   @IsOptional()
-  price: number
+  price?: number
 }
 
 class BillFrom {
   @IsString()
   @IsNotEmpty()
   @IsOptional()
-  address: string
+  address?: string
 
   @IsString()
   @IsNotEmpty()
   @IsOptional()
-  city: string
+  city?: string
 
   @IsString()
   @IsNotEmpty()
   @IsOptional()
-  country: string
+  country?: string
 
   @IsString()
   @IsNotEmpty()
   @IsOptional()
-  postcode: string
+  postcode?: string
 }
 
 export class CreateDraftInvoiceDTO {
   @IsDateString()
   @IsOptional()
-  date: Date
+  date?: Date
 
   @IsString()
   @IsNotEmpty()
   @IsOptional()
-  description: string
+  description?: string
 
   @IsIn([1, 7, 14, 30])
   @IsOptional()
-  paymentTerm: number
+  paymentTerm?: number
 
   @ValidateNested()
   @IsOptional()
   @IsObject()
   @Type(() => BillFrom)
-  billFrom: BillFrom
+  billFrom?: BillFrom
 
   @ValidateNested()
   @IsOptional()
   @IsObject()
   @Type(() => BillTo)
-  billTo: BillTo
+  billTo?: BillTo
 
   @ValidateNested({ each: true })
   @IsOptional()
   @ArrayNotEmpty()
   @Type(() => Item)
-  items: Item[]
+  items?: Item[]
 }

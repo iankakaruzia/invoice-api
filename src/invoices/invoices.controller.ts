@@ -9,12 +9,15 @@ import {
   UseGuards
 } from '@nestjs/common'
 import { User as UserModel } from '@prisma/client'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { CurrentUser } from '../shared/decorators/current-user.decorator'
 import { CreateDraftInvoiceDTO } from './dtos/create-draft-invoice.dto'
 import { CreatePendingInvoiceDTO } from './dtos/create-pending-invoice.dto'
 import { InvoicesService } from './invoices.service'
 
+@ApiTags('Invoices')
+@ApiBearerAuth()
 @Controller('invoices')
 @UseGuards(JwtAuthGuard)
 export class InvoicesController {
