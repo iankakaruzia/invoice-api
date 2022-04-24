@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { Status, User as UserModel } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 import { CreateDraftInvoiceDTO } from './dtos/create-draft-invoice.dto'
-import { CreatePendingInvoiceDTO } from './dtos/create-pending-invoice.dto'
+import { SavePendingInvoiceDTO } from './dtos/save-pending-invoice.dto'
 import {
   GetInvoicesResultDTO,
   InvoiceDTO
@@ -11,6 +11,7 @@ import { GetInvoicesDTO } from './dtos/get-invoices.dto'
 import { calculateDueDate } from './helpers/calculate-due-date'
 import { calculateTotalItems } from './helpers/calculate-total-items'
 import { generateSlug } from './helpers/generate-slug'
+import { isSameInvoice, SavedInvoice } from './helpers/is-same-invoice'
 
 @Injectable()
 export class InvoicesService {
@@ -37,7 +38,7 @@ export class InvoicesService {
   }
 
   async createPendingInvoice(
-    { items = [], billFrom, billTo, ...others }: CreatePendingInvoiceDTO,
+    { items = [], billFrom, billTo, ...others }: SavePendingInvoiceDTO,
     user: UserModel
   ) {
     const slug = await this.createUniqueSlug(generateSlug())
@@ -172,7 +173,6 @@ export class InvoicesService {
       data: {
         invoices: invoicesDTO
       },
-      previousCursor: cursor,
       nextCursor:
         invoices.length === InvoicesService.invoicesPerPage
           ? Buffer.from(invoices[invoices.length - 1].id.toString()).toString(
@@ -180,6 +180,111 @@ export class InvoicesService {
             )
           : null
     }
+  }
+
+  async deleteInvoice(invoiceId: number, user: UserModel) {
+    const invoice = await this.prisma.invoice.findFirst({
+      where: {
+        id: invoiceId,
+        userId: user.id
+      }
+    })
+
+    if (!invoice) {
+      throw new NotFoundException('Unable to find the invoice')
+    }
+
+    await this.prisma.invoice.delete({
+      where: {
+        id: invoice.id
+      }
+    })
+  }
+
+  async updateInvoice(
+    invoiceId: number,
+    savePendingInvoiceDTO: SavePendingInvoiceDTO,
+    user: UserModel
+  ) {
+    const { items, billFrom, billTo, ...others } = savePendingInvoiceDTO
+    const invoice = await this.prisma.invoice.findFirst({
+      where: {
+        id: invoiceId,
+        userId: user.id
+      },
+      select: {
+        id: true,
+        description: true,
+        date: true,
+        paymentTerm: true,
+        billFrom: true,
+        billTo: true,
+        items: true
+      }
+    })
+
+    if (!invoice) {
+      throw new NotFoundException('Unable to find the invoice')
+    }
+
+    const isSameInvoices = isSameInvoice(
+      invoice as SavedInvoice,
+      savePendingInvoiceDTO
+    )
+
+    if (isSameInvoices) {
+      return
+    }
+
+    const deleteInvoiceItems = this.prisma.invoice.update({
+      where: {
+        id: invoice.id
+      },
+      data: {
+        items: {
+          deleteMany: {
+            invoiceId: invoice.id
+          }
+        }
+      }
+    })
+
+    const updateInvoice = this.prisma.invoice.update({
+      where: {
+        id: invoice.id
+      },
+      data: {
+        ...others,
+        status: Status.PENDING,
+        billTo: {
+          upsert: {
+            update: {
+              ...billTo
+            },
+            create: {
+              ...billTo
+            }
+          }
+        },
+        billFrom: {
+          upsert: {
+            update: {
+              ...billFrom
+            },
+            create: {
+              ...billFrom
+            }
+          }
+        },
+        items: {
+          createMany: {
+            data: items
+          }
+        }
+      }
+    })
+
+    await this.prisma.$transaction([deleteInvoiceItems, updateInvoice])
   }
 
   private async createUniqueSlug(slug: string): Promise<string> {

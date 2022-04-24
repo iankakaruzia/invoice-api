@@ -68,7 +68,7 @@ class Item {
   price: number
 }
 
-export class CreatePendingInvoiceDTO {
+export class SavePendingInvoiceDTO {
   @IsDateString()
   date: Date
 

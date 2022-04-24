@@ -1,11 +1,15 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
   Post,
+  Put,
   Query,
   UseGuards
 } from '@nestjs/common'
@@ -14,7 +18,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { CurrentUser } from '../shared/decorators/current-user.decorator'
 import { CreateDraftInvoiceDTO } from './dtos/create-draft-invoice.dto'
-import { CreatePendingInvoiceDTO } from './dtos/create-pending-invoice.dto'
+import { SavePendingInvoiceDTO } from './dtos/save-pending-invoice.dto'
 import { InvoicesService } from './invoices.service'
 import { GetInvoicesDTO } from './dtos/get-invoices.dto'
 
@@ -54,11 +58,11 @@ export class InvoicesController {
 
   @Post()
   async createPendingInvoice(
-    @Body() createPendingInvoiceDTO: CreatePendingInvoiceDTO,
+    @Body() savePendingInvoiceDTO: SavePendingInvoiceDTO,
     @CurrentUser() user: UserModel
   ) {
     return await this.invoicesService.createPendingInvoice(
-      createPendingInvoiceDTO,
+      savePendingInvoiceDTO,
       user
     )
   }
@@ -69,5 +73,24 @@ export class InvoicesController {
     @CurrentUser() user: UserModel
   ) {
     return this.invoicesService.setInvoiceAsPaid(id, user)
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Delete(':id')
+  async deleteInvoice(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: UserModel
+  ) {
+    return this.invoicesService.deleteInvoice(id, user)
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Put(':id')
+  async updateInvoice(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() savePendingInvoiceDTO: SavePendingInvoiceDTO,
+    @CurrentUser() user: UserModel
+  ) {
+    return this.invoicesService.updateInvoice(id, savePendingInvoiceDTO, user)
   }
 }

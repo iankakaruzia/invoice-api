@@ -5,7 +5,6 @@ export class GetInvoicesResultDTO {
     invoices: InvoiceDTO[]
   }
   nextCursor: string | null
-  previousCursor: string | null
 }
 
 export class InvoiceDTO {
