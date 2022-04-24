@@ -59,15 +59,15 @@ jobs:
           name: Run prettier check
           command: npm run prettier:check
 
-  unit_tests:
-    executor: app-executor
-    steps:
-      - checkout
-      - *show-current-branch-name
-      - *restore-cache
-      - run:
-          name: Run unit tests
-          command: npm run test
+  # unit_tests:
+  #   executor: app-executor
+  #   steps:
+  #     - checkout
+  #     - *show-current-branch-name
+  #     - *restore-cache
+  #     - run:
+  #         name: Run unit tests
+  #         command: npm run test
 
 workflows:
   check_and_deploy:
@@ -85,17 +85,18 @@ workflows:
           filters:
             branches:
               only: main
-      - unit_tests:
-          requires:
-            - linting
-            - prettier
-          filters:
-            branches:
-              only: main
+      # - unit_tests:
+      #     requires:
+      #       - linting
+      #       - prettier
+      #     filters:
+      #       branches:
+      #         only: main
       - heroku/deploy-via-git:
           force: true
           requires:
-            - unit_tests
+            - linting
+            - prettier
           filters:
             branches:
               only: main
