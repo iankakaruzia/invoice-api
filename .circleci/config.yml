@@ -62,7 +62,7 @@ jobs:
   unit_tests:
     executor: app-executor
     docker:
-      - image: cimg/postgres
+      - image: cimg/postgres:14.2
         environment:
           POSTGRES_USER: invoice
           POSTGRES_PASSWORD: invoice123
