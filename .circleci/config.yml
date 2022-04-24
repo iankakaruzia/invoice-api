@@ -6,12 +6,7 @@ orbs:
 executors:
   app-executor:
     docker:
-      - image: circleci/node:14
-      - image: circleci/postgres
-        environment:
-          POSTGRES_USER: invoice
-          POSTGRES_PASSWORD: invoice123
-          POSTGRES_DB: invoice
+      - image: cimg/node:14
     working_directory: ~/repo
 
 aliases:
@@ -66,6 +61,12 @@ jobs:
 
   unit_tests:
     executor: app-executor
+    docker:
+      - image: cimg/postgres
+        environment:
+          POSTGRES_USER: invoice
+          POSTGRES_PASSWORD: invoice123
+          POSTGRES_DB: invoice
     steps:
       - checkout
       - *show-current-branch-name
