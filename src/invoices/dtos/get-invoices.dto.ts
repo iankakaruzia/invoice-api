@@ -1,9 +1,10 @@
 import { Status } from '@prisma/client'
 import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator'
+import { StatusEnum } from '../types/status.enum'
 
 export class GetInvoicesDTO {
   @IsOptional()
-  @IsEnum(Status)
+  @IsEnum(StatusEnum)
   status?: Status
 
   @IsOptional()

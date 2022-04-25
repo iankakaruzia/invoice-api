@@ -11,12 +11,14 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
+  name           String
+  password       String
+  profilePhoto   String?
+  preferredTheme Theme?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   invoices Invoice[]
 
@@ -94,4 +96,9 @@ enum Status {
   DRAFT
   PENDING
   PAID
+}
+
+enum Theme {
+  LIGHT
+  DARK
 }

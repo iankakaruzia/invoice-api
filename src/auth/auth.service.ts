@@ -37,7 +37,7 @@ export class AuthService {
     return user
   }
 
-  login({ email, name }: UserModel) {
+  login({ email, name, profilePhoto, preferredTheme }: UserModel) {
     const payload: JwtPayload = { email }
     const accessToken = this.jwtService.sign(payload)
 
@@ -45,7 +45,9 @@ export class AuthService {
       accessToken,
       user: {
         name,
-        email
+        email,
+        profilePhoto,
+        preferredTheme
       }
     }
   }
