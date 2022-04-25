@@ -18,7 +18,7 @@ import { UpdateProfileDTO } from './dtos/update-profile.dto'
 import { UpdateThemeDTO } from './dtos/update-theme.dto'
 import { UsersService } from './users.service'
 
-@ApiTags('Invoices')
+@ApiTags('Users')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('users')
