@@ -59,30 +59,29 @@ jobs:
           name: Run prettier check
           command: npm run prettier:check
 
-  unit_tests:
-    executor: app-executor
-    docker:
-      - image: cimg/postgres:14.2
-        container_name: invoicepostgres
-        environment:
-          POSTGRES_USER: invoice
-          POSTGRES_PASSWORD: invoice123
-          POSTGRES_DB: invoice
-    steps:
-      - checkout
-      - *show-current-branch-name
-      - *restore-cache
-      - run:
-          name: Waiting for PostgreSQL
-          command: dockerize -wait tcp://localhost:5432 -timeout 1m
-      - run:
-          name: Run unit tests
-          command: npm run test
-    environment:
-      DATABASE_URL: postgresql://invoice:invoice123@invoicepostgres:5432/invoice?schema=public
-      POSTGRES_USER: invoice
-      POSTGRES_PASSWORD: invoice123
-      POSTGRES_DB: invoice
+  # unit_tests:
+  #   executor: app-executor
+  #   docker:
+  #     - image: cimg/postgres:14.2
+  #       environment:
+  #         POSTGRES_USER: invoice
+  #         POSTGRES_PASSWORD: invoice123
+  #         POSTGRES_DB: invoice
+  #   steps:
+  #     - checkout
+  #     - *show-current-branch-name
+  #     - *restore-cache
+  #     - run:
+  #         name: Waiting for PostgreSQL
+  #         command: dockerize -wait tcp://localhost:5432 -timeout 1m
+  #     - run:
+  #         name: Run unit tests
+  #         command: npm run test
+  #   environment:
+  #     DATABASE_URL: postgresql://invoice:invoice123@invoicepostgres:5432/invoice?schema=public
+  #     POSTGRES_USER: invoice
+  #     POSTGRES_PASSWORD: invoice123
+  #     POSTGRES_DB: invoice
 
 workflows:
   check_and_deploy:
@@ -100,17 +99,18 @@ workflows:
           filters:
             branches:
               only: main
-      - unit_tests:
-          requires:
-            - linting
-            - prettier
-          filters:
-            branches:
-              only: main
+      # - unit_tests:
+      #     requires:
+      #       - linting
+      #       - prettier
+      #     filters:
+      #       branches:
+      #         only: main
       - heroku/deploy-via-git:
           force: true
           requires:
-            - unit_tests
+            - linting
+            - prettier
           filters:
             branches:
               only: main
