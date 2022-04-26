@@ -8,6 +8,7 @@ import { LocalStrategy } from './strategies/local.strategy'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
 import { JwtStrategy } from './strategies/jwt.strategy'
+import { MailModule } from '../mail/mail.module'
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { JwtStrategy } from './strategies/jwt.strategy'
         secret: configService.get('JWT_SECRET'),
         signOptions: { expiresIn: `${configService.get('JWT_EXPIRES_IN')}s` }
       })
-    })
+    }),
+    MailModule
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
   controllers: [AuthController],

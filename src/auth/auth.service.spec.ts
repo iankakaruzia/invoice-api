@@ -1,5 +1,6 @@
 import { JwtService } from '@nestjs/jwt'
 import { Test, TestingModule } from '@nestjs/testing'
+import { MailService } from '../mail/mail.service'
 import { CryptographyService } from '../cryptography/cryptography.service'
 import { PrismaService } from '../prisma/prisma.service'
 import { AuthService } from './auth.service'
@@ -13,7 +14,11 @@ describe('AuthService', () => {
         AuthService,
         PrismaService,
         CryptographyService,
-        { provide: JwtService, useValue: { sign: jest.fn() } }
+        { provide: JwtService, useValue: { sign: jest.fn() } },
+        {
+          provide: MailService,
+          useValue: { sendForgotPasswordEmail: jest.fn() }
+        }
       ]
     }).compile()
 

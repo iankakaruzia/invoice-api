@@ -11,14 +11,16 @@ datasource db {
 }
 
 model User {
-  id             Int      @id @default(autoincrement())
-  email          String   @unique
-  name           String
-  password       String
-  profilePhoto   String?
-  preferredTheme Theme?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id                      Int      @id @default(autoincrement())
+  email                   String   @unique
+  name                    String
+  password                String
+  profilePhoto            String?
+  preferredTheme          Theme?
+  resetPasswordToken      String?
+  resetPasswordExpiration BigInt?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 
   invoices Invoice[]
 
