@@ -37,6 +37,11 @@ export class InvoicesController {
     return this.invoicesService.getInvoices(getInvoicesDTO, user)
   }
 
+  // @Get('seed')
+  // async seedDatabase(@CurrentUser() user: UserModel) {
+  //   return this.invoicesService.seedDatabase(user)
+  // }
+
   @Get(':id')
   async getInvoiceById(
     @Param('id', ParseIntPipe) id: number,

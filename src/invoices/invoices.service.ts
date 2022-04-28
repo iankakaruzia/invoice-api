@@ -12,6 +12,7 @@ import { calculateDueDate } from './helpers/calculate-due-date'
 import { calculateTotalItems } from './helpers/calculate-total-items'
 import { generateSlug } from './helpers/generate-slug'
 import { isSameInvoice, SavedInvoice } from './helpers/is-same-invoice'
+// import { seedData } from './seed'
 
 @Injectable()
 export class InvoicesService {
@@ -286,6 +287,19 @@ export class InvoicesService {
 
     await this.prisma.$transaction([deleteInvoiceItems, updateInvoice])
   }
+
+  // async seedDatabase(user: UserModel) {
+  //   seedData.forEach(async (invoice) => {
+  //     await this.createDraftInvoice(
+  //       {
+  //         ...invoice,
+  //         date: new Date(invoice.date),
+  //         paymentTerm: parseInt(invoice.paymentTerm)
+  //       },
+  //       user
+  //     )
+  //   })
+  // }
 
   private async createUniqueSlug(slug: string): Promise<string> {
     const existingInvoice = await this.prisma.invoice.findUnique({
