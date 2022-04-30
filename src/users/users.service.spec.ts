@@ -1,8 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { User as UserModel } from '@prisma/client'
+import * as streamifier from 'streamifier'
 import { PrismaService } from '../prisma/prisma.service'
 import { UploadService } from '../upload/upload.service'
 import { UsersService } from './users.service'
+
+jest.mock('streamifier', () => ({
+  createReadStream: jest.fn()
+}))
 
 describe('UsersService', () => {
   let service: UsersService
@@ -29,6 +34,31 @@ describe('UsersService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined()
+  })
+
+  describe('uploadProfilePhoto', () => {
+    it('should call update with correct data and return correct data', async () => {
+      const mockedFile = {
+        buffer: Buffer.from('some-file')
+      } as Express.Multer.File
+      const createReadStreamSpy = jest.spyOn(streamifier, 'createReadStream')
+      jest
+        .spyOn(uploadServiceMock, 'uploadStream')
+        .mockResolvedValue({ secure_url: 'some-img-url' })
+
+      const result = await service.uploadProfilePhoto(mockedFile, {
+        id: 1
+      } as UserModel)
+
+      expect(createReadStreamSpy).toHaveBeenCalledWith(mockedFile.buffer)
+      expect(prismaServiceMock.user.update).toHaveBeenCalledWith({
+        where: { id: 1 },
+        data: { profilePhoto: 'some-img-url' }
+      })
+      expect(result).toStrictEqual({
+        profilePhoto: 'some-img-url'
+      })
+    })
   })
 
   describe('uploadTheme', () => {
