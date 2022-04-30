@@ -4,6 +4,7 @@ import { MailService } from '../mail/mail.service'
 import { CryptographyService } from '../cryptography/cryptography.service'
 import { PrismaService } from '../prisma/prisma.service'
 import { AuthService } from './auth.service'
+import { prismaServiceMock } from '../test/__mocks__/prisma'
 
 describe('AuthService', () => {
   let service: AuthService
@@ -12,7 +13,7 @@ describe('AuthService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
-        PrismaService,
+        { provide: PrismaService, useValue: prismaServiceMock },
         CryptographyService,
         { provide: JwtService, useValue: { sign: jest.fn() } },
         {
